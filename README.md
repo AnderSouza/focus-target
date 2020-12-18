@@ -1,46 +1,40 @@
-# Getting Started with Create React App
+# Project name
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![GitHub repo size](https://img.shields.io/github/repo-size/andersouza/focus-target?style=for-the-badge)![GitHub](https://img.shields.io/github/license/andersouza/focus-target?style=for-the-badge)![npm](https://img.shields.io/npm/v/focus-target?style=for-the-badge)
 
-## Available Scripts
+Focus Target is a focus management utility that allows React developers to easily create navigation flows and control where and how the focus in the page goes.
+You can set keyboard shortcuts and define what element will have the initial focus.
 
-In the project directory, you can run:
+## :star2: Features
 
-### `yarn start`
+- :+1: React Component with a non-intrusive syntax.
+- :keyboard: Set your own keyboard shortcuts. As many as you like.
+- :mag: Initial focus definition.
+- :gear: Also offers a custom React Hook.
+- :shield: Build with TypeScript.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## :computer: Installation
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+You can get it through NPM.
 
-### `yarn test`
+```
+npm install focus-target
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## :hammer_and_wrench: Usage
 
-### `yarn build`
+Here's a code example:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+<usage_example>
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Add run commands and examples you think users will find useful. Provide an options reference for bonus points!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## :email: Contact
 
-### `yarn eject`
+If you want to contact me you can reach me at <andersonoliveira_souza@outlook.com>.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## :page_facing_up: License
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+This project is licensed under the [MIT License](./LICENSE).

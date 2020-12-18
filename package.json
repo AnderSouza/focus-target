@@ -1,7 +1,24 @@
 {
-  "name": "react-focus-manager",
+  "name": "focus-target",
+  "description": "Focus management utility that allows React developers to easily create navigation flows.",
+  "title": "Focus Target",
+  "keywords": [
+    "focus",
+    "manager",
+    "target",
+    "react",
+    "frontend"
+  ],
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andersouza/focus-target"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Anderson Souza"
+  ],
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
