@@ -9,17 +9,54 @@ import { produce } from "immer";
 import { Config, FocusTarget, Props } from "../types/index";
 import { WritableDraft } from "immer/dist/internal";
 
-// WRITE UNIT TESTS FOR ALL THESE FUNCTIONS
-const getUniqueTargets = (targets: FocusTarget[]) => {
-  const set = new Set();
-  return targets.filter((target: FocusTarget) => {
-    if (set.has(target.name)) {
-      return false;
-    } else {
-      set.add(target.name);
-      return true;
+/* WRITE README FOR THE PROJECT */
+
+/* TURN THE PROJECT INTO A NPM PACKAGE */
+
+export const getUniqueFocusTargetsNames = (targets: FocusTarget[]) => {
+  const set = new Set<string>();
+  targets.forEach((target: FocusTarget) => set.add(target.name));
+  return Array.from(set);
+};
+
+export const getFocusTarget = (
+  targets: FocusTarget[],
+  pressedKeys: string[],
+  previous?: string
+): [boolean, FocusTarget | null] => {
+  for (let target of targets) {
+    for (let targetKeys of target.keys) {
+      const keysMatch = targetKeys.reduce(
+        (acc: boolean, targetKey: string) =>
+          acc ? pressedKeys.includes(targetKey) : false,
+        true
+      );
+
+      const previousIsSet = target.previous;
+      const previousMatch = previous === target.previous;
+
+      const found = previousIsSet ? previousMatch && keysMatch : keysMatch;
+
+      if (found) {
+        return [true, target];
+      }
     }
-  });
+  }
+  return [false, null];
+};
+
+export const addKey = (keyToAdd: string, pressedKeys: string[]) => {
+  const draftFunction = (draft: WritableDraft<string[]>) => {
+    draft.push(keyToAdd);
+  };
+  return produce(pressedKeys, draftFunction);
+};
+
+export const removeKey = (keyToRemove: string, pressedKeys: string[]) => {
+  const draftFunction = (draft: WritableDraft<string[]>) => {
+    return draft.filter((key) => key !== keyToRemove);
+  };
+  return produce(pressedKeys, draftFunction);
 };
 
 export const useFocusManager = (config: Config): Props => {
@@ -29,35 +66,11 @@ export const useFocusManager = (config: Config): Props => {
   const [currentlyFocused, setCurrentlyFocused] = useState("");
 
   const refs = useRef(
-    getUniqueTargets(config.targets).map((target) => ({
-      name: target.name,
+    getUniqueFocusTargetsNames(config.targets).map((name: string) => ({
+      name: name,
       ref: React.createRef<HTMLInputElement>(),
     }))
   );
-
-  const getTarget = (keys: string[], previous?: string) => {
-    for (let target of config.targets) {
-      for (let targetKeys of target.keys) {
-        const KEYS_MATCH = targetKeys.reduce(
-          (acc: boolean, targetKey: string) =>
-            acc ? keys.includes(targetKey) : false,
-          true
-        );
-
-        const PREVIOUS_IS_SET = previous && target.previous;
-        const PREVIOUS_MATCH = previous === target.previous;
-
-        const FOUND = PREVIOUS_IS_SET
-          ? PREVIOUS_MATCH && KEYS_MATCH
-          : KEYS_MATCH;
-
-        if (FOUND) {
-          return target;
-        }
-      }
-    }
-    return null;
-  };
 
   const getRef = (name: string) => {
     for (let ref of refs.current) {
@@ -66,27 +79,11 @@ export const useFocusManager = (config: Config): Props => {
     return null;
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>): void => {
-    const addKey = (draft: WritableDraft<string[]>) => {
-      draft.push(event.key);
-    };
-    handleKey(event, addKey);
-  };
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>): void =>
+    setPressedKeys(addKey(event.key, pressedKeys));
 
-  const handleKeyUp = (event: KeyboardEvent<HTMLElement>): void => {
-    const removeKey = (draft: WritableDraft<string[]>) => {
-      return draft.filter((key) => key !== event.key);
-    };
-    handleKey(event, removeKey);
-  };
-
-  const handleKey = (
-    event: KeyboardEvent<HTMLElement>,
-    draftFunction: (draft: WritableDraft<string[]>) => any
-  ) => {
-    const updatedPressedKeys = produce(pressedKeys, draftFunction);
-    setPressedKeys(updatedPressedKeys);
-  };
+  const handleKeyUp = (event: KeyboardEvent<HTMLElement>): void =>
+    setPressedKeys(removeKey(event.key, pressedKeys));
 
   const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
     setCurrentlyFocused(event.target.name);
@@ -100,12 +97,16 @@ export const useFocusManager = (config: Config): Props => {
   }, []);
 
   useEffect(() => {
-    const target = getTarget(pressedKeys, currentlyFocused);
-    if (target) {
+    const [found, target] = getFocusTarget(
+      config.targets,
+      pressedKeys,
+      currentlyFocused
+    );
+    if (found && target) {
       const ref = getRef(target.name);
       ref && ref.current && ref.current.focus();
     }
-  }, [pressedKeys]);
+  }, [pressedKeys, refs, currentlyFocused, config.targets]);
 
   return {
     getRef,
