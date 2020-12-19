@@ -4,20 +4,14 @@ import React, {
   cloneElement,
   CSSProperties,
 } from "react";
-import { Config, handleFocus } from "./../types/index";
+import { injectProps, Config } from "../types/index";
+import { useFocusTarget } from "./use-focus-target";
 
-import { useFocusManager } from "./use-focus-manager";
-
-const injectProps = (
-  child: ReactElement,
-  ref: RefObject<HTMLInputElement> | null,
-  handleFocus: handleFocus
-) => {
+const inject: injectProps = (child, ref, handleFocus) => {
   return cloneElement(child, { ref, onFocus: handleFocus });
 };
 
 const isSupported = (type: any) => {
-  console.log("type", type);
   switch (type) {
     case "input":
     case "textarea":
@@ -27,7 +21,7 @@ const isSupported = (type: any) => {
   }
 };
 
-export const FocusManager = ({
+export const FocusTarget = ({
   config,
   children,
   className,
@@ -38,7 +32,7 @@ export const FocusManager = ({
   className?: string;
   style?: CSSProperties;
 }) => {
-  const { getRef, handleKeyDown, handleKeyUp, handleFocus } = useFocusManager(
+  const { getRef, handleKeyDown, handleKeyUp, handleFocus } = useFocusTarget(
     config
   );
   return (
@@ -51,7 +45,7 @@ export const FocusManager = ({
     >
       {children.map((child: ReactElement) =>
         isSupported(child.type)
-          ? injectProps(child, getRef(child.props.name), handleFocus)
+          ? inject(child, getRef(child.props.name), handleFocus)
           : child
       )}
     </div>

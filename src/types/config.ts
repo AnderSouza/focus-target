@@ -1,12 +1,9 @@
-import { RefObject } from "react";
-import { FocusTarget } from "./focus-target";
+import { Target } from "./target";
 
-type Config = {
-  initial: {
+export type Config = {
+  initialFocus: {
     target: string;
     delay: number;
   };
-  targets: FocusTarget[];
+  targets: Target[];
 };
-
-export type { Config };

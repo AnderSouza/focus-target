@@ -6,32 +6,30 @@ import React, {
   useRef,
 } from "react";
 import { produce } from "immer";
-import { Config, FocusTarget, Props } from "../types/index";
+import { Config, Target, Props } from "../types/index";
 import { WritableDraft } from "immer/dist/internal";
 
-/* WRITE README FOR THE PROJECT */
-
-/* TURN THE PROJECT INTO A NPM PACKAGE */
-
-export const getUniqueFocusTargetsNames = (targets: FocusTarget[]) => {
+export const getUniqueTargetsNames = (targets: Target[]) => {
   const set = new Set<string>();
-  targets.forEach((target: FocusTarget) => set.add(target.name));
+  targets.forEach((target: Target) => set.add(target.name));
   return Array.from(set);
 };
 
-export const getFocusTarget = (
-  targets: FocusTarget[],
+export const getTarget = (
+  targets: Target[],
   pressedKeys: string[],
   previous?: string
-): [boolean, FocusTarget | null] => {
+): [boolean, Target | null] => {
   for (let target of targets) {
     for (let targetKeys of target.keys) {
-      const keysMatch = targetKeys.reduce(
-        (acc: boolean, targetKey: string) =>
-          acc ? pressedKeys.includes(targetKey) : false,
-        true
-      );
-
+      const sizeMatches = targetKeys.length === pressedKeys.length;
+      const keysMatch =
+        sizeMatches &&
+        targetKeys.reduce(
+          (acc: boolean, targetKey: string) =>
+            acc ? pressedKeys.includes(targetKey) : false,
+          true
+        );
       const previousIsSet = target.previous;
       const previousMatch = previous === target.previous;
 
@@ -47,7 +45,7 @@ export const getFocusTarget = (
 
 export const addKey = (keyToAdd: string, pressedKeys: string[]) => {
   const draftFunction = (draft: WritableDraft<string[]>) => {
-    draft.push(keyToAdd);
+    !draft.includes(keyToAdd) && draft.push(keyToAdd);
   };
   return produce(pressedKeys, draftFunction);
 };
@@ -59,16 +57,16 @@ export const removeKey = (keyToRemove: string, pressedKeys: string[]) => {
   return produce(pressedKeys, draftFunction);
 };
 
-export const useFocusManager = (config: Config): Props => {
+export const useFocusTarget = (config: Config): Props => {
   const value: string[] = [];
   const [pressedKeys, setPressedKeys] = useState(value);
 
   const [currentlyFocused, setCurrentlyFocused] = useState("");
 
   const refs = useRef(
-    getUniqueFocusTargetsNames(config.targets).map((name: string) => ({
+    getUniqueTargetsNames(config.targets).map((name: string) => ({
       name: name,
-      ref: React.createRef<HTMLInputElement>(),
+      ref: React.createRef<any>(),
     }))
   );
 
@@ -79,25 +77,25 @@ export const useFocusManager = (config: Config): Props => {
     return null;
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>): void =>
+  const handleKeyDown = <T>(event: KeyboardEvent<T>): void =>
     setPressedKeys(addKey(event.key, pressedKeys));
 
-  const handleKeyUp = (event: KeyboardEvent<HTMLElement>): void =>
+  const handleKeyUp = <T>(event: KeyboardEvent<T>): void =>
     setPressedKeys(removeKey(event.key, pressedKeys));
 
-  const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
+  const handleFocus = <T extends { name: string }>(event: FocusEvent<T>) => {
     setCurrentlyFocused(event.target.name);
   };
 
   useEffect(() => {
-    let ref = getRef(config.initial.target);
+    let ref = getRef(config.initialFocus.target);
     setTimeout(() => {
       ref && ref.current && ref.current.focus();
-    }, config.initial.delay);
+    }, config.initialFocus.delay);
   }, []);
 
   useEffect(() => {
-    const [found, target] = getFocusTarget(
+    const [found, target] = getTarget(
       config.targets,
       pressedKeys,
       currentlyFocused
@@ -106,7 +104,7 @@ export const useFocusManager = (config: Config): Props => {
       const ref = getRef(target.name);
       ref && ref.current && ref.current.focus();
     }
-  }, [pressedKeys, refs, currentlyFocused, config.targets]);
+  }, [pressedKeys]);
 
   return {
     getRef,

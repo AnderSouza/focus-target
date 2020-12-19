@@ -1,9 +1,9 @@
 import { KeyboardEvent, FocusEvent, RefObject } from "react";
 
-type getRef = (name: string) => RefObject<HTMLInputElement> | null;
-type handleKeyDown = (event: KeyboardEvent<HTMLElement>) => void;
-type handleKeyUp = (event: KeyboardEvent<HTMLElement>) => void;
-type handleFocus = (event: FocusEvent<HTMLInputElement>) => void;
+type getRef = <T>(name: string) => RefObject<T> | null;
+type handleKeyDown = <T>(event: KeyboardEvent<T>) => void;
+type handleKeyUp = <T>(event: KeyboardEvent<T>) => void;
+type handleFocus = <T extends {name: string}>(event: FocusEvent<T>) => void;
 
 type Props = {
   getRef: getRef;

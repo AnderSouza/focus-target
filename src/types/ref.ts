@@ -1,7 +1,6 @@
 import {RefObject} from "react";
 
-type Ref = {
+export type Ref = {
   name: string;
-  element: RefObject<HTMLInputElement>;
+  element: RefObject<HTMLElement>;
 };
-export type { Ref };

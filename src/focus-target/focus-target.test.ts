@@ -1,9 +1,9 @@
 import {
-  getUniqueFocusTargetsNames,
-  getFocusTarget,
+  getUniqueTargetsNames,
+  getTarget,
   addKey,
   removeKey,
-} from "./use-focus-manager";
+} from "./use-focus-target";
 
 const targets = [
   {
@@ -24,11 +24,11 @@ const targets = [
   },
 ];
 
-describe("FocusManager", () => {
+describe("FocusTarget", () => {
   it("gets only the unique focus targets names from the passed targets.", () => {
     const expected = ["field1", "field3", "field2"];
 
-    const actual = getUniqueFocusTargetsNames(targets);
+    const actual = getUniqueTargetsNames(targets);
     expect(actual).toMatchObject(expected);
   });
   it("gets the first target that matches the passed keys.", () => {
@@ -40,7 +40,7 @@ describe("FocusManager", () => {
       ],
     };
 
-    const [found, actual] = getFocusTarget(targets, ["Control", "Shift"]);
+    const [found, actual] = getTarget(targets, ["Control", "Shift"]);
     expect(found ? actual : {}).toMatchObject(expected);
   });
   it("gets the first target that matches the passed keys and previous.", () => {
@@ -49,7 +49,7 @@ describe("FocusManager", () => {
       previous: "field2",
       keys: [["Control", "Shift"]],
     };
-    const [found, actual] = getFocusTarget(
+    const [found, actual] = getTarget(
       targets,
       ["Control", "Shift"],
       "field2"
