@@ -25,7 +25,7 @@ npm install --save focus-target
 
 #### Here's how to use the component:
 
-```react
+```typescript
 import React from "react";
 import { FocusTarget } from "focus-target";
 const config = {
@@ -97,7 +97,7 @@ In all, the refs and event handlers themselves are being passed to the elements 
 
 #### Here's how to use the Hook:
 
-``` react
+``` typescript
 import React from "react";
 import { useFocusTarget } from "focus-target";
 
