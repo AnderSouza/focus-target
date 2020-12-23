@@ -1,15 +1,14 @@
 import React, {
-  RefObject,
   ReactElement,
   cloneElement,
   CSSProperties,
+  useEffect,
 } from "react";
-import { injectProps, Config } from "../types/index";
-import { useFocusTarget } from "./use-focus-target";
+import { injectProps, Target } from "../types/index";
+import FocusTarget from "./focus-target";
 
-const inject: injectProps = (child, ref, handleFocus) => {
-  return cloneElement(child, { ref, onFocus: handleFocus });
-};
+const inject: injectProps = (child, ref, handleFocus) =>
+  cloneElement(child, { ref, onFocus: handleFocus });
 
 const isSupported = (type: any) => {
   switch (type) {
@@ -21,20 +20,30 @@ const isSupported = (type: any) => {
   }
 };
 
-export const FocusTarget = ({
-  config,
+export const EventBoundary = ({
+  targets,
+  initialFocus,
   children,
   className,
   style,
 }: {
-  config: Config;
+  targets: Target[];
+  initialFocus: string;
   children: ReactElement[];
   className?: string;
   style?: CSSProperties;
 }) => {
-  const { getRef, handleKeyDown, handleKeyUp, handleFocus } = useFocusTarget(
-    config
-  );
+  const {
+    getRef,
+    handleKeyDown,
+    handleKeyUp,
+    handleFocus,
+    focus,
+  } = FocusTarget(targets, false);
+
+  useEffect(() => {
+    focus(initialFocus);
+  }, []);
   return (
     <div
       onKeyDown={handleKeyDown}

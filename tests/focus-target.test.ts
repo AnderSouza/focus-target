@@ -3,7 +3,7 @@ import {
   getTarget,
   addKey,
   removeKey,
-} from "./use-focus-target";
+} from "./../src/focus-target/func.focus-target";
 
 const targets = [
   {
@@ -49,11 +49,7 @@ describe("FocusTarget", () => {
       previous: "field2",
       keys: [["Control", "Shift"]],
     };
-    const [found, actual] = getTarget(
-      targets,
-      ["Control", "Shift"],
-      "field2"
-    );
+    const [found, actual] = getTarget(targets, ["Control", "Shift"], "field2");
     expect(found ? actual : {}).toMatchObject(expected);
   });
   it("adds a key to the pressed keys array", () => {

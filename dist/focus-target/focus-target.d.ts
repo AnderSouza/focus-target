@@ -1,8 +1,3 @@
-import React, { ReactElement, CSSProperties } from "react";
-import { Config } from "../types/index";
-export declare const FocusTarget: ({ config, children, className, style, }: {
-    config: Config;
-    children: ReactElement[];
-    className?: string | undefined;
-    style?: React.CSSProperties | undefined;
-}) => JSX.Element;
+import { Props, Target } from "../types/index";
+declare const _default: (targets: Target[], global: boolean) => Props;
+export default _default;

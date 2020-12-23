@@ -7,11 +7,10 @@ You can set keyboard shortcuts and define what element will have the initial foc
 
 ## :star2: Features
 
-- :+1: React Component with a non-intrusive syntax.
+- :gear: React Component with a non-intrusive syntax.
 - :keyboard: Set your own keyboard shortcuts. As many as you like.
 - :mag: Initial focus definition.
-- :gear: Also offers a custom React Hook.
-- :shield: Build with TypeScript.
+- :shield: Built with TypeScript.
 
 ## :computer: Installation
 
@@ -27,30 +26,68 @@ npm install --save focus-target
 
 ```typescript
 import React from "react";
-import { FocusTarget } from "focus-target";
-const config = {
-  initialFocus: {
-    target: "firstName",
-    delay: 250,
+import { EventBoundary } from "focus-target";
+const targets = [
+  {
+    name: "firstName",
+    keys: [["Control", "Alt", "1"]],
   },
-  targets: [
-    {
-      name: "firstName",
-      keys: [["Control", "Alt", "1"]],
-    },
-    {
-      name: "lastName",
-      keys: [["Control", "Alt", "2"]],
-    },
-    {
-      name: "age",
-      keys: [["Control", "Alt", "3"]],
-    },
-  ],
-};
+  {
+    name: "lastName",
+    keys: [["Control", "Alt", "2"]],
+  },
+  {
+    name: "age",
+    previous: "lastName",
+    keys: [["Control", "Alt", "3"]],
+  },
+];
 export function App() {
   return (
-    <FocusTarget config={config}>
+    <EventBoundary targets={targets} initialFocus="firstName">
+      <label>First name:</label>
+      <input name="firstName" type="text" />
+      <label>Last name:</label>
+      <input name="lastName" type="text" />
+      <label>Age:</label>
+      <input name="age" type="number" />
+    </EventBoundary>
+  );
+}
+```
+
+This is the **`Target`** type:
+
+```typescript
+ type Target = {
+  name: string;
+  previous?: string;
+  keys: string[][];
+}
+```
+
+The **`EventBoundary`** takes an array of**`Target`** objects. The `initialFocus` basically receives the name of the input used to apply the focus on once the component mounts. 
+
+The `targets` themselves are composed of the values of the `name` attribute of the inputs, the ```event.key``` value for any keys you decide to use and the `previous` element. The previous element corresponds to the element that is focused at the moment you press the keys shortcut. Look at this target taken from the example:
+
+```typescript
+{
+  name: "age",
+  previous: "lastName",
+  keys: [["Control", "Alt", "3"]],
+}
+```
+
+This `target` determines that the shortcut `Control` + `Alt` + `3` is only going to work if the input with the name `lastName` is focused at the moment the shortcut is pressed.
+
+**`EventBoundary`** only captures events when itself or its inputs are focused. In order to capture events globally, you should use the **`FocusTarget`** function described further down.
+
+Lastly, you should know that refs and event handlers are being passed to the elements under the hood. They are required to make the event capturing and focus work properly. But **they are only going to work if the inputs are at the first nesting level**. The following example **wouldn't** work. Note how the inputs are inside the labels, therefore not in the first nesting level.
+
+```typescript
+export function App() {
+  return (
+    <EventBoundary targets={targets} initialFocus="firstName">
       <label>
         First name: <input name="firstName" type="text" />
       </label>
@@ -58,127 +95,86 @@ export function App() {
         Last name: <input name="lastName" type="text" />
       </label>
       <label>
-        Age: <input name="age" type="number" />
+        Age:
+        <input name="age" type="number" />
       </label>
-    </FocusTarget>
+    </EventBoundary>
   );
 }
 ```
 
-This is the **`Config`** type:
-
-```typescript
- type Config = {
-     initialFocus: {
-         target: string;
-         delay: number;
-     };
-	targets: Target[];
-}
-```
-
-And this is the **`Target`** type:
+#### Here's how to use the FocusTarget function:
 
 ``` typescript
- type Target = {
- 	name: string;
-  	previous?: string;
- 	keys: string[][];
-};
-```
+import React, { useEffect } from "react";
+import { FocusTarget } from "focus-target";
 
-The **`Config`** takes an object with the initial focus and the targets. 
-
-The `initialFocus` basically receives the name of the input and the delay in millisseconds used to apply the focus. The delay exists for cases in which you might apply the focus on a component that takes a little time to mount.
-
-The `targets` themselves are composed of the values of the `name` attribute of the inputs and the ```event.key``` value for any keys you decide to use. 
-
-In all, the refs and event handlers themselves are being passed to the elements under the hood.
-
-#### Here's how to use the Hook:
-
-``` typescript
-import React from "react";
-import { useFocusTarget } from "focus-target";
-
-const config = {
-  initialFocus: {
-    target: "firstName",
-    delay: 250,
+const targets = [
+  {
+    name: "firstName",
+    keys: [["Control", "Alt", "1"]],
   },
-  targets: [
-    {
-      name: "firstName",
-      keys: [["Control", "Alt", "1"]],
-    },
-    {
-      name: "lastName",
-      keys: [["Control", "Alt", "2"]],
-    },
-    {
-      name: "age",
-      keys: [["Control", "Alt", "3"]],
-    },
-  ],
-};
+  {
+    name: "lastName",
+    keys: [["Control", "Alt", "2"]],
+  },
+  {
+    name: "age",
+    previous: "lastName",
+    keys: [["Control", "Alt", "3"]],
+  },
+];
 
 export function App() {
-  const { getRef, handleKeyDown, handleKeyUp, handleFocus } = useFocusTarget(
-    config
-  );
+  const {
+    getRef,
+    handleKeyDown,
+    handleKeyUp,
+    handleFocus,
+    focus,
+  } = FocusTarget(targets, false);
+  useEffect(() => {
+    focus("firstName");
+  }, []);
   return (
     <div onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
-      <label>
-        First name:
-        <input
-          name="firstName"
-          type="text"
-          onFocus={handleFocus}
-          ref={getRef("firstName")}
-        />
-      </label>
-      <label>
-        Last name:
-        <input
-          name="lastName"
-          type="text"
-          onFocus={handleFocus}
-          ref={getRef("lastName")}
-        />
-      </label>
-      <label>
-        Age:
-        <input
-          name="age"
-          type="number"
-          onFocus={handleFocus}
-          ref={getRef("age")}
-        />
-      </label>
+      <label>First name:</label>
+      <input
+        name="firstName"
+        type="text"
+        ref={getRef("firstName")}
+        onFocus={handleFocus}
+      />
+      <label>Last name:</label>
+      <input
+        name="lastName"
+        type="text"
+        ref={getRef("lastName")}
+        onFocus={handleFocus}
+      />
+      <label>Age:</label>
+      <input
+        name="age"
+        type="number"
+        ref={getRef("age")}
+        onFocus={handleFocus}
+      />
     </div>
   );
 }
 ```
 
-These are the types for the returned props:
+The **`FocusTarget`** function can be used instead of the **`EventBoundary`** component. It takes two arguments: the targets and a boolean to indicate whether the event capturing will be global or not.
 
-**``` type getRef = <T>(name: string) => RefObject<T> | null;```**
+In the above example the global event capturing is deactivated and a `div` was used to wrap the inputs inside the `handleKeyDown` and `handleKeyUp` handlers. Activating global event capturing would make these two handlers be attached to the `window`  object. In addition, `useEffect` was used to setup the initial focus on the `firstName` input once the component mounts.
 
-**`` type handleKeyDown = <T>(event: KeyboardEvent<T>) => void``**
+`getRef` returns a referent to be attached to the correspondent input and `handleFocus` is used in order to know which component is currently focused.
 
-**`` type handleKeyUp = <T>(event: KeyboardEvent<T>) => void;``**
-
-**`` type handleFocus = <T extends {name: string}>(event: FocusEvent<T>) => void;``**
-
-We're using the `handleFocus` to let the hook know which input is currently focused and `getRef` to retrieve an internal reference to be applied to the element.
-
-The enclosing div was made focusable through the `tabIndex` property. Therefore it must be focused in order to capture keyboard events. `handleKeyUp` and `handleKeyDown`were associated to it in order to make it work as a event boundary around the inputs. 
-
-In case you want the events to be captured on the page as a whole, associating `handleKeyDown` and `handleKeyUp` to the window object could solve your problem.
+Lastly, is important to mention that **`FocusTarget`** is a regular function. **It is not a hook**. React Hooks are not necessary here because this function doesn't return anything to be rendered on the browser. And its workings don't affect the exhibition of any component.
 
 ## :email: Contact
 
-If you want to contact me you can reach me at <andersonoliveira_souza@outlook.com>.
+If you want to contact me, checkout my website https://andersonsouza.dev.
 
 ## :page_facing_up: License
 
