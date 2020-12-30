@@ -1,3 +1,3 @@
 import { EventBoundary } from "./focus-target/event-boundary";
-import FocusTarget from "./focus-target/focus-target";
-export { EventBoundary, FocusTarget };
+import useFocusTarget from "./focus-target/use-focus-target";
+export { EventBoundary, useFocusTarget };

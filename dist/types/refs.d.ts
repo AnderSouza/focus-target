@@ -1,7 +1,5 @@
-/// <reference types="react" />
+import { RefObject } from "react";
 export declare type Refs = {
-    current: {
-        name: string;
-        ref: React.RefObject<HTMLInputElement>;
-    }[];
-};
+    name: string;
+    ref: RefObject<HTMLInputElement>;
+}[];

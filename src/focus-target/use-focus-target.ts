@@ -1,4 +1,4 @@
-import React, { FocusEvent } from "react";
+import React, { FocusEvent, useRef, useEffect } from "react";
 import { Props, Refs, Target } from "../types/index";
 import {
   getUniqueTargetsNames,
@@ -7,11 +7,16 @@ import {
   removeKey,
 } from "./func.focus-target";
 
-let pressedKeys: string[] = [];
-let currentlyFocused = "";
-let refs: Refs = { current: [] };
+export default (targets: Target[], global: boolean): Props => {
+  const refs = useRef<Refs>(
+    getUniqueTargetsNames(targets).map((name: string) => ({
+      name: name,
+      ref: React.createRef<any>(),
+    }))
+  );
+  const pressedKeys = useRef<string[]>([]);
+  const currentlyFocused = useRef("");
 
-export default (targets: Target[], global: boolean) : Props => {
   const getRef = (name: string) => {
     for (let ref of refs.current) {
       if (ref.name === name) return ref.ref;
@@ -21,8 +26,12 @@ export default (targets: Target[], global: boolean) : Props => {
 
   const handleKeyDown = <T>(event: T): void => {
     //@ts-ignore
-    pressedKeys = addKey(event.key, pressedKeys);
-    const [found, target] = getTarget(targets, pressedKeys, currentlyFocused);
+    pressedKeys.current = addKey(event.key, pressedKeys.current);
+    const [found, target] = getTarget(
+      targets,
+      pressedKeys.current,
+      currentlyFocused.current
+    );
     if (found && target) {
       const ref = getRef(target.name);
       ref && ref.current && ref.current.focus();
@@ -31,11 +40,11 @@ export default (targets: Target[], global: boolean) : Props => {
 
   const handleKeyUp = <T>(event: T): void => {
     //@ts-ignore
-    pressedKeys = removeKey(event.key, pressedKeys);
+    pressedKeys.current = removeKey(event.key, pressedKeys.current);
   };
 
   const handleFocus = <T extends { name: string }>(event: FocusEvent<T>) => {
-    currentlyFocused = event.target.name;
+    currentlyFocused.current = event.target.name;
   };
 
   const focus = (name: string) => {
@@ -43,22 +52,12 @@ export default (targets: Target[], global: boolean) : Props => {
     ref && ref.current && ref.current.focus();
   };
 
-  const setup = () => {
-    if (!refs.current.length) {
-      refs = {
-        current: getUniqueTargetsNames(targets).map((name: string) => ({
-          name: name,
-          ref: React.createRef<any>(),
-        })),
-      };
-      if (global) {
-        window.onkeydown = handleKeyDown;
-        window.onkeyup = handleKeyUp;
-      }
+  useEffect(() => {
+    if (global) {
+      window.onkeydown = handleKeyDown;
+      window.onkeyup = handleKeyUp;
     }
-  };
-
-  setup();
+  }, []);
 
   return {
     getRef,

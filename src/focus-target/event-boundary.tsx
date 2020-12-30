@@ -5,7 +5,7 @@ import React, {
   useEffect,
 } from "react";
 import { injectProps, Target } from "../types/index";
-import FocusTarget from "./focus-target";
+import FocusTarget from "./use-focus-target";
 
 const inject: injectProps = (child, ref, handleFocus) =>
   cloneElement(child, { ref, onFocus: handleFocus });

@@ -7,7 +7,8 @@ You can set keyboard shortcuts and define what element will have the initial foc
 
 ## :star2: Features
 
-- :gear: React Component with a non-intrusive syntax.
+- :thumbsup: React Component with a non-intrusive syntax.
+- :gear: Custom hook to provide more flexibility.
 - :keyboard: Set your own keyboard shortcuts. As many as you like.
 - :mag: Initial focus definition.
 - :shield: Built with TypeScript.
@@ -80,7 +81,7 @@ The `targets` themselves are composed of the values of the `name` attribute of t
 
 This `target` determines that the shortcut `Control` + `Alt` + `3` is only going to work if the input with the name `lastName` is focused at the moment the shortcut is pressed.
 
-**`EventBoundary`** only captures events when itself or its inputs are focused. In order to capture events globally, you should use the **`FocusTarget`** function described further down.
+**`EventBoundary`** only captures events when itself or its inputs are focused. In order to capture events globally, you should use the **`useFocusTarget`** hook described further down.
 
 Lastly, you should know that refs and event handlers are being passed to the elements under the hood. They are required to make the event capturing and focus work properly. But **they are only going to work if the inputs are at the first nesting level**. The following example **wouldn't** work. Note how the inputs are inside the labels, therefore not in the first nesting level.
 
@@ -103,11 +104,11 @@ export function App() {
 }
 ```
 
-#### Here's how to use the FocusTarget function:
+#### Here's how to use the useFocusTarget hook:
 
 ``` typescript
 import React, { useEffect } from "react";
-import { FocusTarget } from "focus-target";
+import { useFocusTarget } from "focus-target";
 
 const targets = [
   {
@@ -132,7 +133,7 @@ export function App() {
     handleKeyUp,
     handleFocus,
     focus,
-  } = FocusTarget(targets, false);
+  } = useFocusTarget(targets, false);
   useEffect(() => {
     focus("firstName");
   }, []);
@@ -164,13 +165,11 @@ export function App() {
 }
 ```
 
-The **`FocusTarget`** function can be used instead of the **`EventBoundary`** component. It takes two arguments: the targets and a boolean to indicate whether the event capturing will be global or not.
+The **`useFocusTarget`** hook can be used instead of the **`EventBoundary`** component. It takes two arguments: the targets and a boolean to indicate whether the event capturing will be global or not.
 
 In the above example the global event capturing is deactivated and a `div` was used to wrap the inputs inside the `handleKeyDown` and `handleKeyUp` handlers. Activating global event capturing would make these two handlers be attached to the `window`  object. In addition, `useEffect` was used to setup the initial focus on the `firstName` input once the component mounts.
 
 `getRef` returns a referent to be attached to the correspondent input and `handleFocus` is used in order to know which component is currently focused.
-
-Lastly, is important to mention that **`FocusTarget`** is a regular function. **It is not a hook**. React Hooks are not necessary here because this function doesn't return anything to be rendered on the browser. And its workings don't affect the exhibition of any component.
 
 ## :email: Contact
 
