@@ -67,7 +67,7 @@ This is the **`Target`** type:
 }
 ```
 
-The **`EventBoundary`** takes an array of**`Target`** objects. The `initialFocus` basically receives the name of the input used to apply the focus on once the component mounts. 
+The **`EventBoundary`** takes an array of **`Target`** objects. The `initialFocus` basically receives the name of the input used to apply the focus on once the component mounts. 
 
 The `targets` themselves are composed of the values of the `name` attribute of the inputs, the ```event.key``` value for any keys you decide to use and the `previous` element. The previous element corresponds to the element that is focused at the moment you press the keys shortcut. Look at this target taken from the example:
 

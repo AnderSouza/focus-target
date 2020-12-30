@@ -1,4 +1,4 @@
-import React, { FocusEvent, useRef, useEffect } from "react";
+import React, { FocusEvent, useRef, useEffect, RefObject } from "react";
 import { Props, Refs, Target } from "../types/index";
 import {
   getUniqueTargetsNames,
@@ -14,26 +14,50 @@ export default (targets: Target[], global: boolean): Props => {
       ref: React.createRef<any>(),
     }))
   );
+
   const pressedKeys = useRef<string[]>([]);
   const currentlyFocused = useRef("");
 
   const getRef = (name: string) => {
+    // console.log("trying to get ref for " + name);
+    // console.log("internal refs seen from getRef", refs);
     for (let ref of refs.current) {
-      if (ref.name === name) return ref.ref;
+      if (ref.name === name) {
+        // console.log(`Returning this ref for ${name}`, ref.ref);
+        return ref.ref;
+      }
     }
-    return null;
+    return undefined;
+  };
+
+  const setRef = (newRef: RefObject<any>) => {
+    // console.log("setting new ref", newRef);
+    if (newRef && newRef.current) {
+      const name = newRef.current.name;
+      refs.current.forEach(
+        (
+          ref: { name: string; ref: RefObject<HTMLInputElement> },
+          index: number
+        ) => {
+          if (ref.name === name) refs.current[index].ref = newRef;
+        }
+      );
+    }
   };
 
   const handleKeyDown = <T>(event: T): void => {
     //@ts-ignore
     pressedKeys.current = addKey(event.key, pressedKeys.current);
+    console.log("these are my pressedkeys", pressedKeys.current);
     const [found, target] = getTarget(
       targets,
       pressedKeys.current,
       currentlyFocused.current
     );
+    console.log("and this is my target", target);
     if (found && target) {
       const ref = getRef(target.name);
+      console.log('i"m about to focus on', ref);
       ref && ref.current && ref.current.focus();
     }
   };
@@ -43,7 +67,8 @@ export default (targets: Target[], global: boolean): Props => {
     pressedKeys.current = removeKey(event.key, pressedKeys.current);
   };
 
-  const handleFocus = <T extends { name: string }>(event: FocusEvent<T>) => {
+  const handleFocus = <T>(event: FocusEvent<T>) => {
+    //@ts-ignore
     currentlyFocused.current = event.target.name;
   };
 
@@ -61,6 +86,7 @@ export default (targets: Target[], global: boolean): Props => {
 
   return {
     getRef,
+    setRef,
     handleFocus,
     handleKeyDown,
     handleKeyUp,
