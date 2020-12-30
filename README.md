@@ -5,6 +5,8 @@
 Focus Target is a focus management utility that allows React developers to easily create navigation flows and control where and how the focus in the page goes.
 You can set keyboard shortcuts and define what element will have the initial focus.
 
+**You can find a [live demo](https://andersonsouza.dev/focus-target) here **.
+
 ## :star2: Features
 
 - :thumbsup: React Component with a non-intrusive syntax.
