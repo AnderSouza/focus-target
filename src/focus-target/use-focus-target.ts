@@ -19,11 +19,8 @@ export default (targets: Target[], global: boolean): Props => {
   const currentlyFocused = useRef("");
 
   const getRef = (name: string) => {
-    // console.log("trying to get ref for " + name);
-    // console.log("internal refs seen from getRef", refs);
     for (let ref of refs.current) {
       if (ref.name === name) {
-        // console.log(`Returning this ref for ${name}`, ref.ref);
         return ref.ref;
       }
     }
@@ -31,7 +28,6 @@ export default (targets: Target[], global: boolean): Props => {
   };
 
   const setRef = (newRef: RefObject<any>) => {
-    // console.log("setting new ref", newRef);
     if (newRef && newRef.current) {
       const name = newRef.current.name;
       refs.current.forEach(
@@ -46,18 +42,16 @@ export default (targets: Target[], global: boolean): Props => {
   };
 
   const handleKeyDown = <T>(event: T): void => {
+    console.clear();
     //@ts-ignore
     pressedKeys.current = addKey(event.key, pressedKeys.current);
-    console.log("these are my pressedkeys", pressedKeys.current);
     const [found, target] = getTarget(
       targets,
       pressedKeys.current,
       currentlyFocused.current
     );
-    console.log("and this is my target", target);
     if (found && target) {
       const ref = getRef(target.name);
-      console.log('i"m about to focus on', ref);
       ref && ref.current && ref.current.focus();
     }
   };
