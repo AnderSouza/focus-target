@@ -62,6 +62,7 @@ export default (targets: Target[], global: boolean): Props => {
   };
 
   const handleFocus = <T>(event: FocusEvent<T>) => {
+    pressedKeys.current = [];
     //@ts-ignore
     currentlyFocused.current = event.target.name;
   };
