@@ -42,9 +42,12 @@ export default (targets: Target[], global: boolean): Props => {
   };
 
   const handleKeyDown = <T>(event: T): void => {
-    console.clear();
     //@ts-ignore
-    pressedKeys.current = addKey(event.key, pressedKeys.current);
+    let key = event.key;
+    key = key.length === 1 ? key.toLowerCase() : key;
+    // Developer tools
+    if (key === "F12") return;
+    pressedKeys.current = addKey(key, pressedKeys.current);
     const [found, target] = getTarget(
       targets,
       pressedKeys.current,
@@ -58,11 +61,13 @@ export default (targets: Target[], global: boolean): Props => {
 
   const handleKeyUp = <T>(event: T): void => {
     //@ts-ignore
-    pressedKeys.current = removeKey(event.key, pressedKeys.current);
+    let key = event.key;
+    key = key.length === 1 ? key.toLowerCase() : key;
+
+    pressedKeys.current = removeKey(key, pressedKeys.current);
   };
 
   const handleFocus = <T>(event: FocusEvent<T>) => {
-    pressedKeys.current = [];
     //@ts-ignore
     currentlyFocused.current = event.target.name;
   };

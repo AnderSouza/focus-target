@@ -20,7 +20,11 @@ export const getTarget = (
         sizeMatches &&
         targetKeys.reduce(
           (acc: boolean, targetKey: string) =>
-            acc ? pressedKeys.includes(targetKey) : false,
+            acc
+              ? pressedKeys.includes(
+                  targetKey.length === 1 ? targetKey.toLowerCase() : targetKey
+                )
+              : false,
           true
         );
       const previousIsSet = target.previous;
